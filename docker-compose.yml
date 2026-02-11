@@ -15,6 +15,9 @@ services:
 
   backend:
     container_name: backend
+    volumes:
+    - ./server:/backend
+    - /backend/node_modules
     build: 
       context: ./server
       dockerfile: Dockerfile
@@ -24,7 +27,7 @@ services:
     ports:
       - "4000:4000" #host:conteiner
     env_file: 
-      - server/.env 
+      - ./server/.env
     depends_on:
       db:
         condition: service_healthy
@@ -38,7 +41,7 @@ services:
     - "5432:5432"
     restart: unless-stopped
     env_file:
-      - server/.env
+      - ./server/.env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1 -p 5432"]
       interval: 10s
@@ -53,6 +56,9 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+    volumes:
+      - ./client:/frontend
+      - /frontend/node_modules
     ports:
       - "3000:3000"
     env_file:
