@@ -15,12 +15,17 @@ services:
 
   backend:
     container_name: backend
-    volumes:
-    - ./server:/backend
-    - /backend/node_modules
     build: 
       context: ./server
       dockerfile: Dockerfile
+    command: npm run start:dev
+    develop:
+      watch:
+        - action: sync
+          path: ./server
+          target: /backend
+        - action: rebuild
+          path: ./server/package.json
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -56,9 +61,14 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    volumes:
-      - ./client:/frontend
-      - /frontend/node_modules
+    command: npm run dev
+    develop:
+      watch:
+        - action: sync
+          path: ./client
+          target: /frontend
+        - action: rebuild
+          path: ./client/package.json
     ports:
       - "3000:3000"
     env_file:
